@@ -1,15 +1,8 @@
 import React, { createContext, useState } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
-import axios from "axios";
 
-// Set axios to always send cookies
-axios.defaults.withCredentials = true;
-
-export const Context = createContext({
-  isAuthenticated: false,
-  admin: {},
-});
+export const Context = createContext({ isAuthenticated: false });
 
 const AppWrapper = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
