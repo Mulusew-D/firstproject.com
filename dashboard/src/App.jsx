@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -10,47 +10,74 @@ import Login from "./components/Login";
 import AddNewDoctor from "./components/AddNewDoctor";
 import Messages from "./components/Messages";
 import Doctors from "./components/Doctors";
+import AddNewAdmin from "./components/AddNewAdmin";
+import Sidebar from "./components/Sidebar";
 import { Context } from "./main";
 import axios from "axios";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Sidebar from "./components/Sidebar";
-import AddNewAdmin from "./components/AddNewAdmin";
 import "./App.css";
 
 const App = () => {
   const { isAuthenticated, setIsAuthenticated, admin, setAdmin } =
     useContext(Context);
+  const [loading, setLoading] = useState(true); // Loading state to prevent flash
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchAdmin = async () => {
       try {
         const response = await axios.get(
-          "https://mediserve-backend.onrender.com/api/v1/user/admin/me",
-          {
-            withCredentials: true,
-          }
+          "https://mediserve-backend.onrender.com/api/v1/user/admin/me"
         );
         setIsAuthenticated(true);
         setAdmin(response.data.user);
       } catch (error) {
         setIsAuthenticated(false);
         setAdmin({});
+      } finally {
+        setLoading(false);
       }
     };
-    fetchUser();
-  }, [isAuthenticated]);
+
+    fetchAdmin();
+  }, []); // run only once
+
+  if (loading) return <p>Loading...</p>; // Optional: Spinner or blank page
 
   return (
     <Router>
       <Sidebar />
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/doctor/addnew" element={<AddNewDoctor />} />
-        <Route path="/admin/addnew" element={<AddNewAdmin />} />
-        <Route path="/messages" element={<Messages />} />
-        <Route path="/doctors" element={<Doctors />} />
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? <Dashboard /> : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/doctor/addnew"
+          element={
+            isAuthenticated ? <AddNewDoctor /> : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/admin/addnew"
+          element={
+            isAuthenticated ? <AddNewAdmin /> : <Navigate to="/login" />
+          }
+        />
+        <Route
+          path="/messages"
+          element={isAuthenticated ? <Messages /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/doctors"
+          element={isAuthenticated ? <Doctors /> : <Navigate to="/login" />}
+        />
+        <Route
+          path="/login"
+          element={isAuthenticated ? <Navigate to="/" /> : <Login />}
+        />
       </Routes>
       <ToastContainer position="top-center" />
     </Router>
