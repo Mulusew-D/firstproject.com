@@ -18,7 +18,7 @@ config({ path: "./config/config.env" });
 app.use(
   cors({
     origin: [
-      process.env.FRONTEND_URL_ONE || "http://localhost:5173",
+      process.env.FRONTEND_URL_ONE || "https://mediserve-8ebc03jr5-mulusew-desales-projects.vercel.app",
       process.env.FRONTEND_URL_TWO || "http://localhost:5174"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
