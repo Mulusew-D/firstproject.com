@@ -18,7 +18,7 @@ config({ path: "./config/config.env" });
 app.use(
   cors({
     origin: [
-      process.env.FRONTEND_URL_ONE || "https://mediserve-ruddy.vercel.app",
+      process.env.FRONTEND_URL_ONE || "https://mediserve-frontend.netlify.app",
       process.env.DASHBOARD_URL_TWO || "https://mediserve-dashboard.netlify.app"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
