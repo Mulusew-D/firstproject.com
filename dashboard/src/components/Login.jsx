@@ -13,19 +13,18 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
     try {
+      // LOGIN API
       const res = await axios.post(
         "https://mediserve-backend.onrender.com/api/v1/user/login",
         { email, password, role: "Admin" },
-        {
-          withCredentials: true,
-          headers: { "Content-Type": "application/json" },
-        }
+        { withCredentials: true }
       );
 
       toast.success(res.data.message);
 
-      // fetch user info after login
+      // FETCH AUTH USER
       const userRes = await axios.get(
         "https://mediserve-backend.onrender.com/api/v1/user/admin/me",
         { withCredentials: true }
@@ -34,14 +33,15 @@ const Login = () => {
       setUser(userRes.data.user);
       setIsAuthenticated(true);
 
-      navigateTo("/dashboard"); // redirect to dashboard page
+      navigateTo("/"); // redirect to dashboard
+
     } catch (error) {
       toast.error(error.response?.data?.message || "Login failed");
     }
   };
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" />;
+    return <Navigate to="/" />;
   }
 
   return (
@@ -49,6 +49,7 @@ const Login = () => {
       <img src="/logo.png" alt="logo" className="logo" />
       <h1 className="form-title">WELCOME TO MediServe</h1>
       <p>Only Admins Are Allowed To Access These Resources!</p>
+
       <form onSubmit={handleLogin}>
         <input
           type="text"
@@ -56,12 +57,14 @@ const Login = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+
         <div style={{ justifyContent: "center", alignItems: "center" }}>
           <button type="submit">Login</button>
         </div>
