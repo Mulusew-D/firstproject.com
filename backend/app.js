@@ -5,30 +5,28 @@ import { config } from "dotenv";
 import cors from "cors";
 import fileUpload from "express-fileupload";
 import { errorMiddleware } from "./middlewares/error.js";
-
 import messageRouter from "./router/messageRouter.js";
 import userRouter from "./router/userRouter.js";
 import appointmentRouter from "./router/appointmentRouter.js";
 
 const app = express();
+
+// Load environment variables
 config({ path: "./config/config.env" });
 
-/* ------------ CORS FIX (VERY IMPORTANT) ------------- */
+// Enable CORS for frontend URLs
 app.use(
   cors({
     origin: [
-      "https://mediserve-ruddy.vercel.app",     // Frontend
-      "https://mediserve-dashboard.netlify.app", // Dashboard
+      process.env.FRONTEND_URL_ONE || "https://mediserve-ruddy.vercel.app",
+      process.env.DASHBOARD_URL_TWO || "https://mediserve-dashboard.netlify.app"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
+    credentials: true
   })
 );
 
-// Required for allowing browser cookies via CORS
-app.options("*", cors());
-
-/* ------------ MIDDLEWARES ------------- */
+// Middleware
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -36,19 +34,24 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   fileUpload({
     useTempFiles: true,
-    tempFileDir: "/tmp/",
+    tempFileDir: "/tmp/"
   })
 );
 
-/* ------------ ROUTES ------------- */
+// API routes
 app.use("/api/v1/message", messageRouter);
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/appointment", appointmentRouter);
 
-/* ------------ DATABASE CONNECTION ------------- */
+// Root route (optional)
+app.get("/", (req, res) => {
+  res.send("Backend is running!");
+});
+
+// Connect to database
 dbConnection();
 
-/* ------------ ERROR HANDLING ------------- */
+// Error handling middleware
 app.use(errorMiddleware);
 
 export default app;
