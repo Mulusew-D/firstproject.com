@@ -1,17 +1,18 @@
 import React, { createContext, useState } from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App.jsx";
+import axios from "axios";
 
-export const Context = createContext({ isAuthenticated: false });
+axios.defaults.withCredentials = true; // ensure cookies are sent
+
+export const Context = createContext({ isAuthenticated: false, admin: {} });
 
 const AppWrapper = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [admin, setAdmin] = useState({});
 
   return (
-    <Context.Provider
-      value={{ isAuthenticated, setIsAuthenticated, admin, setAdmin }}
-    >
+    <Context.Provider value={{ isAuthenticated, setIsAuthenticated, admin, setAdmin }}>
       <App />
     </Context.Provider>
   );
