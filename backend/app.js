@@ -18,7 +18,7 @@ app.use(
   cors({
     origin: [
       "https://mediserve-ruddy.vercel.app",     // Frontend
-      "https://mediserve-dashboard.vercel.app", // Dashboard
+      "https://mediserve-dashboard.netlify.app", // Dashboard
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
