@@ -1,68 +1,59 @@
 import React, { useContext, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
 import AddNewDoctor from "./components/AddNewDoctor";
 import Messages from "./components/Messages";
 import Doctors from "./components/Doctors";
-import AddNewAdmin from "./components/AddNewAdmin";
-import Sidebar from "./components/Sidebar";
 import { Context } from "./main";
 import axios from "axios";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import "./App.css";
+import Sidebar from "./components/Sidebar";
+import AddNewAdmin from "./components/AddNewAdmin";
 
 const App = () => {
-  const { isAuthenticated, setIsAuthenticated, admin, setAdmin } = useContext(Context);
+  const { isAuthenticated, setIsAuthenticated, user, setUser } =
+    useContext(Context);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
+        const res = await axios.get(
           "https://mediserve-backend.onrender.com/api/v1/user/admin/me",
           { withCredentials: true }
         );
+
         setIsAuthenticated(true);
-        setAdmin(response.data.user);
+        setUser(res.data.user);
+
       } catch (error) {
         setIsAuthenticated(false);
-        setAdmin({});
+        setUser(null);
       }
     };
+
     fetchUser();
-    // Only run on mount
-  }, []);
+  }, []); // ✔ Only fetch once (fixes login loop)
 
   return (
     <Router>
-      {isAuthenticated && <Sidebar />}
+      {isAuthenticated && <Sidebar />} {/* Only show if logged in */}
+      
       <Routes>
-        {/* Public Route */}
-        <Route path="/login" element={isAuthenticated ? <Navigate to="/" /> : <Login />} />
-
-        {/* Protected Routes */}
-        <Route
-          path="/"
-          element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/doctor/addnew"
-          element={isAuthenticated ? <AddNewDoctor /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/admin/addnew"
-          element={isAuthenticated ? <AddNewAdmin /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/messages"
-          element={isAuthenticated ? <Messages /> : <Navigate to="/login" />}
-        />
-        <Route
-          path="/doctors"
-          element={isAuthenticated ? <Doctors /> : <Navigate to="/login" />}
-        />
+        <Route path="/" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+        <Route path="/doctor/addnew" element={isAuthenticated ? <AddNewDoctor /> : <Navigate to="/login" />} />
+        <Route path="/admin/addnew" element={isAuthenticated ? <AddNewAdmin /> : <Navigate to="/login" />} />
+        <Route path="/messages" element={isAuthenticated ? <Messages /> : <Navigate to="/login" />} />
+        <Route path="/doctors" element={isAuthenticated ? <Doctors /> : <Navigate to="/login" />} />
       </Routes>
+
       <ToastContainer position="top-center" />
     </Router>
   );
