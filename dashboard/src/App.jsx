@@ -16,44 +16,42 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Sidebar from "./components/Sidebar";
 import AddNewAdmin from "./components/AddNewAdmin";
+import "./App.css";
 
 const App = () => {
-  const { isAuthenticated, setIsAuthenticated, user, setUser } =
+  const { isAuthenticated, setIsAuthenticated, admin, setAdmin } =
     useContext(Context);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await axios.get(
+        const response = await axios.get(
           "https://mediserve-backend.onrender.com/api/v1/user/admin/me",
-          { withCredentials: true }
+          {
+            withCredentials: true,
+          }
         );
-
         setIsAuthenticated(true);
-        setUser(res.data.user);
-
+        setAdmin(response.data.user);
       } catch (error) {
         setIsAuthenticated(false);
-        setUser(null);
+        setAdmin({});
       }
     };
-
     fetchUser();
-  }, []); // ✔ Only fetch once (fixes login loop)
+  }, [isAuthenticated]);
 
   return (
     <Router>
-      {isAuthenticated && <Sidebar />} {/* Only show if logged in */}
-      
+      <Sidebar />
       <Routes>
-        <Route path="/" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
-        <Route path="/doctor/addnew" element={isAuthenticated ? <AddNewDoctor /> : <Navigate to="/login" />} />
-        <Route path="/admin/addnew" element={isAuthenticated ? <AddNewAdmin /> : <Navigate to="/login" />} />
-        <Route path="/messages" element={isAuthenticated ? <Messages /> : <Navigate to="/login" />} />
-        <Route path="/doctors" element={isAuthenticated ? <Doctors /> : <Navigate to="/login" />} />
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/doctor/addnew" element={<AddNewDoctor />} />
+        <Route path="/admin/addnew" element={<AddNewAdmin />} />
+        <Route path="/messages" element={<Messages />} />
+        <Route path="/doctors" element={<Doctors />} />
       </Routes>
-
       <ToastContainer position="top-center" />
     </Router>
   );
